@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">BuscaMinas</string>
+
+    <string name="Instrucciones">Instrucciones</string>
+    <string name="NuevoJuego">Empezar nueva partida</string>
+    <string name="Configuracion">Configuración del juego</string>
+    <string name="SeleccionPersonaje">Elije al personaje</string>
+
 </resources>

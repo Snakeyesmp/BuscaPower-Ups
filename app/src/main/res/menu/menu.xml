@@ -3,18 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/about"
-        android:title="about">
-
+        android:id="@+id/Instrucciones"
+        android:title="@string/Instrucciones">
     </item>
-    <item
-        android:id="@+id/settings"
-        android:title="settings">
 
-    </item>
     <item
-        android:id="@+id/profile"
-        android:title="profile">
+        android:id="@+id/NuevoJuego"
+        android:title="@string/NuevoJuego">
+    </item>
+
+    <item
+        android:id="@+id/Configuracion"
+        android:title="@string/Configuracion">
+    </item>
+
+    <item
+        android:id="@+id/SeleccionPersonaje"
+        android:title="@string/SeleccionPersonaje">
 
     </item>
 
