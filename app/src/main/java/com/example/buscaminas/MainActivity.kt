@@ -6,8 +6,6 @@ import android.util.DisplayMetrics
 import android.view.Menu
 import android.widget.Button
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.marginBottom
-import androidx.core.view.setMargins
 import androidx.gridlayout.widget.GridLayout
 
 class MainActivity : AppCompatActivity() {
@@ -19,41 +17,37 @@ class MainActivity : AppCompatActivity() {
         val toolbar : Toolbar = findViewById (R.id.toolbar)
         // hace que la toolbar funcione como actionbar para la activity window actual
         setSupportActionBar(toolbar)
-
+        // Se crea un gridLayout con el que tenemos en el xml
         val gridLayout : GridLayout = findViewById(R.id.grid)
 
-        val rowCount = 16
-        val columnCount = 16
-
-        // Esta manera de obtener cuanto mide la pantalla está deprecated, pero al estar usando una API antigua no queda otra
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-        val screenWidth = displayMetrics.widthPixels
-        val screenHeight = displayMetrics.heightPixels
-
-        // el ancho del botón será el ancho de la pantalla dividido por el numero de columnas
-        val cellWidth = screenWidth / columnCount
-        val cellHeight = screenHeight / rowCount
-
+        val rowCount = 8
+        val columnCount = 8
+        // Para establecer el numero de filas y de columnas
         gridLayout.rowCount = rowCount
         gridLayout.columnCount = columnCount
 
-        for (i in 1..rowCount) {
-            for (j in 1..columnCount) {
-                var cell = Button(this)
-                // Esto es para poder cambiar los parámetros del boton ( tamaño, margenes, etc.)
-                cell.layoutParams = GridLayout.LayoutParams().apply {
-                    width = cellWidth
-                    height = cellHeight
-                }
+        // for anidado con el numero de filas y de columnas
+        for (fila in 1..rowCount) {
+            for (columna in 1..columnCount) {
+                // se crea un boton
+                val boton = Button(this)
 
-                // Agrega la celda al GridLayout.
-                gridLayout.addView(cell)
+                // Esto es para ajustar los parámetros del boton (tamaño, etc.)
+                boton.layoutParams = GridLayout.LayoutParams().apply{
+                    width = 0
+                    height = 0
+                    // Columnspec y rowspec se utiliza para que los botones se distribuyan por la pantalla (1f es el peso)
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED,1f)
+                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED,1f)
+                    setMargins(0,0,0,0)
+
+                }
+                // Se agrega cada boton a su espacio en el grid
+                boton.setPadding(0,0,0,0)
+
+                gridLayout.addView(boton)
             }
         }
-
-
 
     }
 
