@@ -3,6 +3,7 @@ package com.example.buscaminas
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         // hace que la toolbar funcione como actionbar para la activity window actual
         setSupportActionBar(toolbar)
 
+
     }
 
     /**
@@ -40,8 +42,7 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val texto: String
-        // dependiendo de que item pulses cambia el texto que se mostrará en el toast
+        // dependiendo de que item pulses en el menu llama a una función u otra
         when (item.itemId) {
             R.id.Instrucciones -> {
                 mostrarInstrucciones()
@@ -56,14 +57,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.SeleccionPersonaje -> {
-
+                mostrarPopupSeleccionPersonaje()
             }
 
             else -> return false
         }
 
 
-        return true;
+        return true
     }
 
     /**
@@ -77,7 +78,6 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         // Establezo el título instrucciones
         builder.setTitle(R.string.Instrucciones)
-
 
         // Establecer el mensaje y otros atributos del cuadro de diálogo
         builder.setMessage(textoInstrucciones)
@@ -93,6 +93,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Metodo para cuando pulsas el botón de elegir dificultad en el menú
+     */
     private fun mostrarSeleccionDificultad() {
 
         // Saco el array de las dificultades de mi archivo xml
@@ -122,6 +125,9 @@ class MainActivity : AppCompatActivity() {
         builder.create().show()
     }
 
+    /**
+     * Metodo para cuando empiezas partida en el menú
+     */
     private fun empezarPartida() {
 
         // Se crea un gridLayout con el que tenemos en el xml
@@ -146,7 +152,6 @@ class MainActivity : AppCompatActivity() {
                     columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                     rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                     setMargins(0, 0, 0, 0)
-
                 }
                 // Se agrega cada boton a su espacio en el grid
                 boton.setPadding(0, 0, 0, 0)
@@ -156,6 +161,40 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    /**
+     * Metodo que genera un AlertDialog con un spinner para cuando pulses el boton del menu para elegir personaje
+     */
+    private fun mostrarPopupSeleccionPersonaje() {
+        // Lista temporal de los personajes para hacer pruebas TODO hay que poner fotos y tal
+        val personajes = arrayOf(
+            "Personaje 1",
+            "Personaje 2",
+            "Personaje 3",
+            "Personaje 4",
+            "Personaje 5",
+            "Personaje 6"
+        )
+
+        // Se crea un alert dialog al igual que con las instrucciones
+        AlertDialog.Builder(this)
+            // Se establece un titulo para el popup
+            .setTitle("Seleccionar Personaje")
+            // Se hace un adaptador como ya hicimos
+            .setAdapter(
+                ArrayAdapter(
+                    this,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    personajes
+                )
+            ) { _, _ -> }
+            .setPositiveButton("Aceptar") { dialog, _ ->
+                // Código a ejecutar cuando se presiona "Aceptar"
+                dialog.dismiss()
+            }
+            // Muestra el cuadro de dialogo en la pantalla
+            .show()
     }
 
 
