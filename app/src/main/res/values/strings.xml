@@ -5,12 +5,12 @@
     <string name="NuevoJuego">Empezar nueva partida</string>
     <string name="Configuracion">Elegir dificultad</string>
     <string name="SeleccionPersonaje">Elije al personaje</string>
-    <string name= "InstruccionesCompletas"> El juego es tipo buscaminas:
+    <string name="InstruccionesCompletas"> El juego es tipo buscaminas:
 Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay alrededor. Ten cuidado porque si pulsas en una casilla que tenga una mina perderás. Si crees que hay una mina, haz un click largo sobre la casilla para señalarla. No hagas un click largo en una casilla donde no hjay minas porque pederás. Ganas cuando has encontrado todas las minas </string>
 
     <array name="dificultades">
         <item>Principiante</item>
-        <item>Amateur </item>
+        <item>Amateur</item>
         <item>Profesional</item>
     </array>
 
@@ -19,5 +19,12 @@ Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay al
         <item>12</item> <!-- Amateur -->
         <item>16</item> <!-- Profesional -->
     </array>
+
+    <array name="numero_minas">
+        <item>10</item> <!-- Principiante -->
+        <item>30</item> <!-- Amateur -->
+        <item>60</item> <!-- Profesional -->
+    </array>
+
 
 </resources>
