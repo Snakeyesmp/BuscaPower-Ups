@@ -2,11 +2,16 @@ package com.example.buscaminas
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.gridlayout.widget.GridLayout
 
@@ -40,7 +45,6 @@ class MainActivity : AppCompatActivity() {
      * Este metodo es llamado cuando seleccionas un item del menu
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
         // dependiendo de que item pulses en el menu llama a una función u otra
         when (item.itemId) {
             R.id.Instrucciones -> {
@@ -55,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                 mostrarSeleccionDificultad()
             }
 
-            R.id.SeleccionPersonaje -> {
+            R.id.BotonPersonaje -> {
                 mostrarPopupSeleccionPersonaje()
             }
 
@@ -162,6 +166,7 @@ class MainActivity : AppCompatActivity() {
                         boton.text =
                             "X" // TODO en vez de la "x" que se muestre una foto de una mina o algo
                     }
+
                     else -> {
                         // Si no hay una mina, te dirá cuantas hay alrededor
                         boton.text = estadoTablero[fila][columna].toString()
@@ -227,8 +232,7 @@ class MainActivity : AppCompatActivity() {
             // Recorre todas las columnas del tablero
             for (columna in 0 until tamanoTablero) {
                 // Si hay mina, no necesita calcular nada
-                if (estadoTablero[fila][columna] == -1) {
-                } else {
+                if (estadoTablero[fila][columna] != -1) {
                     // Calcular el número de minas adyacentes
                     var contadorminas = 0
                     // Recorre las las filas adyacentes (arriba, mismo nivel y abajo)
@@ -246,7 +250,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-
                     // Actualizar el valor en la casilla actual con el número de minas adyacentes
                     estadoTablero[fila][columna] = contadorminas
                 }
@@ -258,27 +261,51 @@ class MainActivity : AppCompatActivity() {
      * Metodo que genera un AlertDialog con un spinner para cuando pulses el boton del menu para elegir personaje
      */
     private fun mostrarPopupSeleccionPersonaje() {
-        // Lista temporal de los personajes para hacer pruebas TODO hay que poner fotos
+        val popupMenu = PopupMenu(this, findViewById(R.id.BotonPersonaje))
+        val inflater: MenuInflater = popupMenu.menuInflater
+        inflater.inflate(R.menu.menu_spinner, popupMenu.menu)
+
+        // Obtener el item del menú que contiene el Spinner
+        val menuItem = popupMenu.menu.findItem(R.id.item_spinner)
+
+        // Obtener la vista del Spinner desde el ítem del menú
+        val actionView = menuItem.actionView as Spinner
+
+        // Un array para seleccionar el personaje TODO que tenga fotos y tal
         val personajes = arrayOf(
-            "Personaje 1", "Personaje 2", "Personaje 3", "Personaje 4", "Personaje 5", "Personaje 6"
+            "Personaje 1",
+            "Personaje 2",
+            "Personaje 3",
+            "Personaje 4",
+            "Personaje 5",
+            "Personaje 6"
         )
 
-        // Se crea un alert dialog al igual que con las instrucciones
-        AlertDialog.Builder(this)
-            // Se establece un titulo para el popup
-            .setTitle("Seleccionar Personaje")
-            // Se hace un adaptador como ya hicimos
-            .setAdapter(
-                ArrayAdapter(
-                    this, android.R.layout.simple_spinner_dropdown_item, personajes
-                )
-            ) { _, _ -> }.setPositiveButton("Aceptar") { dialog, _ ->
-                // Código a ejecutar cuando se presiona "Aceptar"
-                dialog.dismiss()
+        // Crear un ArrayAdapter utilizando el contexto actual, el diseño de la lista simple y la matriz de elementos
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, personajes)
+
+        // Establecer el adaptador en el Spinner
+        actionView.adapter = adapter
+
+        // Manejar la selección del Spinner si es necesario
+        actionView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            // Implementa los métodos necesarios según tus necesidades
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                // Acciones cuando se selecciona un elemento del Spinner
             }
-            // Muestra el cuadro de dialogo en la pantalla
-            .show()
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Acciones cuando no se selecciona nada
+            }
+        }
+
+        // Muestra el menú emergente
+        popupMenu.show()
     }
-
-
 }
+
