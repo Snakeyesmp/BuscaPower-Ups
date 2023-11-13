@@ -16,7 +16,11 @@ import androidx.appcompat.widget.Toolbar
 import androidx.gridlayout.widget.GridLayout
 
 class MainActivity : AppCompatActivity() {
+    // Array con cuantas casilla tiene el lado del tablero
+    private val tamanosTablero = arrayOf(8, 12, 16) // Principiante - Amateur - Profesional
 
+    // Array con cuantas minas tiene el tablero
+    private val numeroMinas = arrayOf(10, 30, 60) // Principiante - Amateur - Profesional
     private var dificultadSeleccionada = 0 // Valor predeterminado
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
@@ -66,7 +70,6 @@ class MainActivity : AppCompatActivity() {
             else -> return false
         }
 
-
         return true
     }
 
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         // Establecer el mensaje y otros atributos del cuadro de diálogo
         builder.setMessage(textoInstrucciones).setCancelable(false)
             // Esto es para cuando se pulse el boton
-            .setPositiveButton("Aceptar") { dialog, _ ->
+            .setPositiveButton(R.string.aceptar) { dialog, _ ->
                 dialog.dismiss()  // Cerrar el cuadro de diálogo
             }
 
@@ -119,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         // dialog es el objeto alertDialog
         builder.setPositiveButton("Entendido!") { dialog, _ ->
             // Actualizar el tamaño del tablero según la dificultad seleccionada
-            tamanoTablero = resources.getIntArray(R.array.tamanos_tablero)[dificultadSeleccionada]
+            tamanoTablero = tamanosTablero[dificultadSeleccionada]
             // Cierra el cuadro de texto
             dialog.dismiss()
         }
@@ -162,9 +165,8 @@ class MainActivity : AppCompatActivity() {
                 // Configurar el botón según el estado del tablero
                 when (estadoTablero[fila][columna]) {
                     -1 -> {
-                        // Si hay una mina, se pone el texto "x" en el botón
-                        boton.text =
-                            "X" // TODO en vez de la "x" que se muestre una foto de una mina o algo
+                        // Si hay una mina, se pone una imagen al botón
+                        boton.setBackgroundResource(R.mipmap.toad_fumon_foreground)
                     }
 
                     else -> {
@@ -198,7 +200,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun colocarminas(estadoTablero: Array<Array<Int>>) {
         // Obtener el número de minas según la dificultad( del array de strings.xml)
-        val numerominas = resources.getIntArray(R.array.numero_minas)[dificultadSeleccionada]
+        val numerominas = numeroMinas[dificultadSeleccionada]
 
         // Lógica para colocar las minas de manera aleatoria utilizando random
         val random = java.util.Random()
@@ -243,7 +245,7 @@ class MainActivity : AppCompatActivity() {
                             val columnaVecina = columna + j
                             // Verificar si la casilla vecina está dentro del tablero
                             if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
-                                // Verificar si la casilla vecina tiene una hipotenocha
+                                // Verificar si la casilla vecina tiene una mina
                                 if (estadoTablero[filaVecina][columnaVecina] == -1) {
                                     contadorminas++
                                 }
@@ -266,7 +268,7 @@ class MainActivity : AppCompatActivity() {
         inflater.inflate(R.menu.menu_spinner, popupMenu.menu)
 
         // Obtener el item del menú que contiene el Spinner
-        val menuItem = popupMenu.menu.findItem(R.id.item_spinner)
+        val menuItem = popupMenu.menu.findItem(R.id.spinner_personajes)
 
         // Obtener la vista del Spinner desde el ítem del menú
         val actionView = menuItem.actionView as Spinner
@@ -307,5 +309,26 @@ class MainActivity : AppCompatActivity() {
         // Muestra el menú emergente
         popupMenu.show()
     }
-}
 
+    /*
+    private fun seleccionPersonaje2() {
+        val spinner: Spinner = findViewById(R.id.spinner_personajes)
+        // Se crea un arrayAdapter con el array de strings que tengo de las ciudades
+        spinner.onItemSelectedListener = this
+        // El primer parámetro es contexto, el segundo es el array con los nombres de las ciudades, y el tercero el identificador del layout para crear los items
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.dificultades,
+            android.R.layout.simple_spinner_item
+        )
+            .also { adapter ->
+                // Este es el layout que se va a usar cuando aparezcan la lista de opciones
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Se aplica el adaptador al spinner
+                spinner.adapter = adapter
+            }
+
+    }
+    */
+
+}

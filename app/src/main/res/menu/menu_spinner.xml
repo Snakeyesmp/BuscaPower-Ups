@@ -2,8 +2,9 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/item_spinner"
-        android:visible="false"
+        android:id="@+id/spinner_personajes"
+        android:visible="true"
         app:actionViewClass="android.widget.Spinner"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:title="@string/SeleccionPersonaje" />
 </menu>
