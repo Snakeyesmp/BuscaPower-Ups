@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -26,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
 
+    // TODO cuando se pierde la partida hacer que se muestre ubicación de todas las minas, intentar meter la skin del personaje, cambiar el menu de fin de partida,
     private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.BotonPersonaje -> {
-                mostrarPopupSeleccionPersonaje()
+                mostrarPopupSeleccionPersonaje2()
             }
 
             else -> return false
@@ -179,7 +182,7 @@ class MainActivity : AppCompatActivity() {
                 boton.setPadding(0, 0, 0, 0)
                 // Un listener para cada boton
                 boton.setOnClickListener {
-                    revelarCelda(fila, columna,boton)
+                    revelarCelda(fila, columna, boton)
                 }
 
                 // Configurar el color del texto según el número de minas adyacentes
@@ -187,9 +190,11 @@ class MainActivity : AppCompatActivity() {
                     1 -> {
                         boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
                     }
+
                     2 -> {
                         boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
                     }
+
                     in 3..8 -> {
                         boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
                     }
@@ -272,7 +277,7 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Metodo que genera un AlertDialog con un spinner para cuando pulses el boton del menu para elegir personaje
-     */
+
     private fun mostrarPopupSeleccionPersonaje() {
         val popupMenu = PopupMenu(this, findViewById(R.id.BotonPersonaje))
         val inflater: MenuInflater = popupMenu.menuInflater
@@ -320,127 +325,160 @@ class MainActivity : AppCompatActivity() {
         // Muestra el menú emergente
         popupMenu.show()
     }
-
-    /*
-    private fun seleccionPersonaje2() {
-        val spinner: Spinner = findViewById(R.id.spinner_personajes)
-        // Se crea un arrayAdapter con el array de strings que tengo de las ciudades
-        spinner.onItemSelectedListener = this
-        // El primer parámetro es contexto, el segundo es el array con los nombres de las ciudades, y el tercero el identificador del layout para crear los items
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.dificultades,
-            android.R.layout.simple_spinner_item
-        )
-            .also { adapter ->
-                // Este es el layout que se va a usar cuando aparezcan la lista de opciones
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                // Se aplica el adaptador al spinner
-                spinner.adapter = adapter
-            }
-
-    }
     */
-    /**
-     *
-     */
-    private fun revelarCelda(fila: Int, columna: Int, boton: Button) {
-        val valor = estadoTablero[fila][columna]
+    private fun mostrarPopupSeleccionPersonaje2() {
 
-        // Verificar si la celda ya está revelada o marcada
-        if (valor == -2 || valor == -3) {
-            return
-        }
-
-        // Si la celda contiene una mina
-        if (valor == -1) {
-            boton.setBackgroundResource(R.drawable.setaroja)
-            mostrarFinDelJuego(false)
-        } else {
-            // Si la celda no contiene una mina
-            when {
-                valor == 0 -> {
-                    // Cambiar el fondo del botón cuando el valor es 0
-                    boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
-                    revelarCasillasAdyacentes(fila, columna)
-                }
-                valor == 1 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
-                }
-                valor == 2 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
-                }
-                valor >= 3 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
-                }
-            }
-            // Mostrar el número o dejar la celda vacía
-            boton.text = if (valor == 0) "" else valor.toString()
-
-            estadoTablero[fila][columna] = -2
-
-            if (verificarVictoria()) {
-                mostrarFinDelJuego(true)
-            }
-        }
-    }
-
-    private fun obtenerBoton(fila: Int, columna: Int): Button {
-        val gridLayout: GridLayout = findViewById(R.id.grid)
-        val indiceBoton = fila * tamanoTablero + columna
-        return gridLayout.getChildAt(indiceBoton) as Button
-    }
-
-    private fun verificarVictoria(): Boolean {
-        for (fila in 0 until tamanoTablero) {
-            for (columna in 0 until tamanoTablero) {
-                if (estadoTablero[fila][columna] >= 0 && estadoTablero[fila][columna] != -2) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    // Mostrar un mensaje al final del juego
-    private fun mostrarFinDelJuego(victoria: Boolean) {
-        val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Fin del juego")
-            .setMessage(mensaje)
-            .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
-            .setNegativeButton("Salir") { _, _ -> finish() }
-            .setCancelable(false)
-            .show()
+
+        val imagenesArray =
+            arrayOf(R.drawable.setaroja, R.drawable.setaverde, R.drawable.estrella, R.drawable.flor)
+
+        val spinner = Spinner(this)
+        // Se crea un arrayAdapter con el array de imagenes
+        spinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            imagenesArray
+        )
+
+        // Hacer que en el spinner, se muestre un texto con la imagen del boton, junto con su correspondiente imagen, para luego cambiar el boton por la imagen seleccionada
+
+
     }
 
-    private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
-        // Verificar si la casilla ya está revelada
-        if (estadoTablero[fila][columna] == -2) {
-            return
-        }
 
-        // Marcar la casilla como revelada
+
+/**
+ * Este metodo hace que se muestre el contenido de un botón(Mina, numero de minas o vacío)
+ *
+ * @param fila: La fila en la que está el boton que llamas
+ * @param columna : La columna en la que está el botón al que llamas
+ * @param boton : El objeto botón en sí
+ *
+ */
+private fun revelarCelda(fila: Int, columna: Int, boton: Button) {
+    val valor = estadoTablero[fila][columna]
+
+    // Verificar si la celda ya está revelada o marcada (Si no está esta comprobaba eternamente las casillas y hacía bucle infinito)
+    if (valor == -2 || valor == -3) {
+        return
+    }
+
+    // Si la celda contiene una mina
+    if (valor == -1) {
+        boton.setBackgroundResource(R.drawable.setaroja)
+        mostrarFinDelJuego(false)
+    } else {
+        // Si la celda no contiene una mina
+        when {
+            valor == 0 -> {
+                // Cambiar el fondo del botón cuando el valor es 0
+                boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
+                // Llamar al metodo para que se revelen todas las celdas que sean 0
+                revelarCasillasAdyacentes(fila, columna)
+            }
+            // Cambiar el color del texto según la cantidad de minas que tengan
+            valor == 1 -> {
+                boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
+            }
+
+            valor == 2 -> {
+                boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
+            }
+
+            valor >= 3 -> {
+                boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
+            }
+        }
+        // Si en la casilla hay 0 minas alrededor se deja vacío, si no se muestra el número que hay
+        boton.text = if (valor == 0) "" else valor.toString()
+        // Se pone valor -2 para indicar que ya no hay minas alrededor
         estadoTablero[fila][columna] = -2
 
-        // Recorrer las filas adyacentes (arriba, mismo nivel y abajo)
-        for (i in -1..1) {
-            // Recorrer las columnas adyacentes (izquierda, mismo nivel y derecha)
-            for (j in -1..1) {
-                val filaVecina = fila + i
-                val columnaVecina = columna + j
-                // Verificar si la casilla vecina está dentro del tablero
-                if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
-                    // Verificar si la casilla vecina no está revelada ni marcada
-                    if (estadoTablero[filaVecina][columnaVecina] !in listOf(-2, -3)) {
-                        // Obtener el botón correspondiente a la casilla vecina
-                        val botonVecino = obtenerBoton(filaVecina, columnaVecina)
-                        // Llamar recursivamente a revelarCelda para la casilla vecina
-                        revelarCelda(filaVecina, columnaVecina, botonVecino)
-                    }
+        // Para saber si has ganado o no, tanto si ganas como si pierdes
+        if (verificarVictoria()) {
+            mostrarFinDelJuego(true)
+        }
+    }
+}
+
+/**
+ *
+ * Este metodo se usa para obtener un boton de una fila y columna determinada, se usa en el metodo de obtener los 0 que hay alrededor
+ *
+ * @param fila : La fila en la que está el botón
+ * @param columna : La columna en la que está el boton
+ *
+ * @return el objeto botón encontrado
+ */
+private fun obtenerBoton(fila: Int, columna: Int): Button {
+    val gridLayout: GridLayout = findViewById(R.id.grid)
+    val indiceBoton = fila * tamanoTablero + columna
+    return gridLayout.getChildAt(indiceBoton) as Button
+}
+
+/**
+ *
+ *
+ *
+ * @return true si has ganado la partida, false si la has perdido
+ *
+ */
+private fun verificarVictoria(): Boolean {
+    for (fila in 0 until tamanoTablero) {
+        for (columna in 0 until tamanoTablero) {
+            if (estadoTablero[fila][columna] >= 0 && estadoTablero[fila][columna] != -2) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+/**
+ *
+ * @param victoria: para saber si has ganado o no la partida
+ *
+ */
+private fun mostrarFinDelJuego(victoria: Boolean) {
+    val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
+    val builder = AlertDialog.Builder(this)
+    builder.setTitle("Fin del juego")
+        .setMessage(mensaje)
+        .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
+        .setNegativeButton("Salir") { _, _ -> finish() }
+        .setCancelable(false)
+        .show()
+}
+
+private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
+
+    // Verificar si la casilla ya está revelada
+    if (estadoTablero[fila][columna] == -2) {
+        return
+    }
+
+    // Marcar la casilla como revelada
+    estadoTablero[fila][columna] = -2
+
+    // Recorrer las filas adyacentes (arriba, mismo nivel y abajo)
+    for (i in -1..1) {
+        // Recorrer las columnas adyacentes (izquierda, mismo nivel y derecha)
+        for (j in -1..1) {
+            val filaVecina = fila + i
+            val columnaVecina = columna + j
+            // Verificar si la casilla vecina está dentro del tablero
+            if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
+                // Verificar si la casilla vecina no está revelada ni marcada
+                if (estadoTablero[filaVecina][columnaVecina] !in listOf(-2, -3)) {
+                    // Obtener el botón correspondiente a la casilla vecina
+                    val botonVecino = obtenerBoton(filaVecina, columnaVecina)
+                    // Llamar recursivamente a revelarCelda para la casilla vecina
+                    revelarCelda(filaVecina, columnaVecina, botonVecino)
                 }
             }
         }
     }
+}
 
 }
