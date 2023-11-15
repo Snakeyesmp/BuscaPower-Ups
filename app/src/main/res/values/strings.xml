@@ -17,7 +17,8 @@ Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay al
     </array>
 
 
-    <string name="Setaroja"> Seta roja</string>
-    <string name="Setaverde"> Seta verde</string>
-    <string name="Flor"> Flor</string>
+    <string name="Setaroja">Seta roja</string>
+    <string name="Setaverde">Seta verde</string>
+    <string name="Flor">Flor</string>
+    <string name="Estrella">Estrella</string>
 </resources>

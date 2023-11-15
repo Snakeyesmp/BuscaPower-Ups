@@ -22,22 +22,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/descripcion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:ellipsize="none"
-                android:scrollHorizontally="false"
-                android:text="No ganan ni una" />
-
+                android:text="@string/Setaroja"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
         </TableRow>
 
         <TableRow
@@ -45,7 +31,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imagenCiudad"
+                android:id="@+id/imagenPersonaje"
                 android:layout_width="301dp"
                 android:layout_height="282dp"
                 android:layout_marginTop="24dp"
