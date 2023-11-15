@@ -19,12 +19,6 @@
     </item>
 
     <item
-        android:id="@+id/SeleccionPersonaje"
-        android:title="@string/SeleccionPersonaje">
-
-    </item>
-
-    <item
         android:id="@+id/BotonPersonaje"
         android:icon="@mipmap/toad_fumon_foreground"
         android:title="@string/BotonPersonaje"

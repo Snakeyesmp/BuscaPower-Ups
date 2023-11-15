@@ -2,6 +2,7 @@ package com.example.buscaminas
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -29,13 +30,18 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
 
-    // TODO cuando se pierde la partida hacer que se muestre ubicación de todas las minas, intentar meter la skin del personaje, cambiar el menu de fin de partida,
+    // TODO cuando se pierde la partida hacer que se muestre ubicación de todas las minas, cambiar el menu de fin de partida.
     private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
 
-    val nombresPersonajes =
-        arrayOf(R.string.Setaroja.toString(), R.string.Setaverde.toString(), R.string.Estrella.toString(), R.string.Flor.toString())
+    lateinit var nombresPersonajes: Array<String>
     val imagenesPersonajes =
         arrayOf(R.drawable.setaroja, R.drawable.setaverde, R.drawable.estrella, R.drawable.flor)
+
+    // Para saber que imagen va a seleccionar el tablero
+    private var seleccion = 0
+
+    // El numero de banderas que ha puesto el usuario
+    private var banderasColocadas = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +53,17 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setSupportActionBar(toolbar)
         estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
 
-
+        nombresPersonajes = arrayOf(
+            getString(R.string.Setaroja),
+            getString(R.string.Setaverde),
+            getString(R.string.Estrella),
+            getString(R.string.Flor)
+        )
 
         val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
-        val adaptadorPersonalizado = AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
+        val adaptadorPersonalizado =
+            AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
         selectorPersonaje.adapter = adaptadorPersonalizado
-        selectorPersonaje.onItemSelectedListener = this
 
 
     }
@@ -195,10 +206,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 }
                 // Se agrega cada boton a su espacio en el grid
                 boton.setPadding(0, 0, 0, 0)
-                // Un listener para cada boton
+                // Un listener de cuando el usuario pulsa para cada boton
                 boton.setOnClickListener {
                     revelarCelda(fila, columna, boton)
                 }
+                // Listener de cuando el usuario mantiene el boton pulsado
+                boton.setOnLongClickListener {
+                    colocarBandera(fila, columna, boton)
+                    true  // Indica que el evento ha sido manejado
+                }
+
 
                 // Configurar el color del texto según el número de minas adyacentes
                 when (estadoTablero[fila][columna]) {
@@ -221,8 +238,33 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         }
 
-
     }
+
+    private fun colocarBandera(fila: Int, columna: Int, boton: Button) {
+        val valor = estadoTablero[fila][columna]
+
+        // Verificar si la celda ya está revelada
+        if (valor == -2) {
+            return
+        }
+
+        // Si la celda no tiene bandera y aún hay banderas disponibles, colocar una bandera (-3)
+        if (valor != -3 && banderasColocadas < numeroMinas[dificultadSeleccionada]) {
+            boton.setBackgroundResource(R.drawable.bandera)
+            estadoTablero[fila][columna] = -3
+            // Aumentar una bandera colocada
+            banderasColocadas++
+        } else if (valor == -3) {
+            // Si la celda ya tiene bandera, quitar la bandera y restaurar el fondo
+            boton.setBackgroundResource(android.R.color.transparent)  // Establecer a fondo transparente (puedes usar null también)
+            estadoTablero[fila][columna] = 0
+            // Disminuir una bandera colocada
+            banderasColocadas--
+        }
+    }
+
+
+
 
     /**
      * Coloca minas en el tablero de manera aleatoria.
@@ -290,74 +332,32 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
-    /**
-     * Metodo que genera un AlertDialog con un spinner para cuando pulses el boton del menu para elegir personaje
-
-    private fun mostrarPopupSeleccionPersonaje() {
-    val popupMenu = PopupMenu(this, findViewById(R.id.BotonPersonaje))
-    val inflater: MenuInflater = popupMenu.menuInflater
-    inflater.inflate(R.menu.menu_spinner, popupMenu.menu)
-
-    // Obtener el item del menú que contiene el Spinner
-    val menuItem = popupMenu.menu.findItem(R.id.spinner_personajes)
-
-    // Obtener la vista del Spinner desde el ítem del menú
-    val actionView = menuItem.actionView as Spinner
-
-    // Un array para seleccionar el personaje TODO que tenga fotos y tal
-    val personajes = arrayOf(
-    "Personaje 1",
-    "Personaje 2",
-    "Personaje 3",
-    "Personaje 4",
-    "Personaje 5",
-    "Personaje 6"
-    )
-
-    // Crear un ArrayAdapter utilizando el contexto actual, el diseño de la lista simple y la matriz de elementos
-    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, personajes)
-
-    // Establecer el adaptador en el Spinner
-    actionView.adapter = adapter
-
-    // Manejar la selección del Spinner si es necesario
-    actionView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-    // Implementa los métodos necesarios según tus necesidades
-    override fun onItemSelected(
-    parent: AdapterView<*>?,
-    view: View?,
-    position: Int,
-    id: Long
-    ) {
-    // Acciones cuando se selecciona un elemento del Spinner
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-    // Acciones cuando no se selecciona nada
-    }
-    }
-
-    // Muestra el menú emergente
-    popupMenu.show()
-    }
-     */
     private fun mostrarPopupSeleccionPersonaje2() {
 
-        val builder = AlertDialog.Builder(this)
+        val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
 
-        // Hacer que en el spinner, se muestre un texto con la imagen del boton, junto con su correspondiente imagen, para luego cambiar el boton por la imagen seleccionada
+        // Cambia la visibilidad del Spinner a VISIBLE
+        selectorPersonaje.visibility = View.VISIBLE
 
 
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val c = view?.findViewById<TextView>(R.id.nombre)
-        val seleccion = findViewById<TextView>(R.id.SeleccionPersonaje)
+        seleccion = position
+
+        val selectedItem = parent?.getItemAtPosition(position).toString()
+        // Agrega un log para imprimir el ítem seleccionado
+        Log.d("SpinnerSelection", "Item seleccionado: $selectedItem")
+
+        // Oculta el Spinner después de seleccionar un personaje
+        val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
+        selectorPersonaje.visibility = View.GONE
+
     }
 
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        val seleccion = findViewById<TextView>(R.id.SeleccionPersonaje)
+
     }
 
     private inner class AdaptadorPersonalizado(
@@ -365,24 +365,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         resource: Int,
         objects: Array<String>
     ) : ArrayAdapter<String>(context, resource, objects) {
-        //Constructor de mi adaptador paso el contexto (this)
-        // el layout, y los elementos
 
-        /**
-         * Reescribo el método getDropDownView para que me devuelva una fila personalizada en la
-         * lista desplegable en vez del elemento que se encuentra en esa posición
-         * @param posicion
-         * @param ViewConvertida
-         * @param padre
-         * @return
-         */
         override fun getDropDownView(
             position: Int,
             convertView: View?,
             parent: ViewGroup
         ): View {
-
-            // Llama a la función para crear la fila personalizada y la devuelve
             return crearFilaPersonalizada(position, convertView, parent)
         }
 
@@ -391,41 +379,27 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             convertView: View?,
             parent: ViewGroup
         ): View {
-            // Este método se llama para mostrar una vista personalizada en el elemento seleccionado
-
-            // Llama a la función para crear la fila personalizada y la devuelve
             return crearFilaPersonalizada(position, convertView, parent)
         }
 
-        /**
-         * Método que me crea mis filas personalizadas pasando como parámetro la posición
-         * la vista y la vista padre
-         * @param position
-         * @param convertView
-         * @param parent
-         * @return
-         */
         private fun crearFilaPersonalizada(
             position: Int,
             convertView: View?,
             parent: ViewGroup
         ): View {
-
-            // Crea un objeto LayoutInflater para inflar la vista personalizada desde un diseño XML
             val layoutInflater = LayoutInflater.from(context)
+            val rowView =
+                convertView ?: layoutInflater.inflate(R.layout.spinner_personajes, parent, false)
 
-            //Declaro una vista de mi fila, y la preparo para inflarla con datos
-            // Los parametros son: XML descriptivo
-            // Vista padre
-            // Booleano que indica si se debe ceñir a las características del padre
-            val rowView = convertView ?: layoutInflater.inflate(R.layout.spinner_personajes, parent, false)
+            // Accede directamente al recurso de cadena usando el índice
+            val nombrePersonajeResourceId = nombresPersonajes[position]
 
-            //Fijamos el nombre de la ciudad
-            rowView.findViewById<TextView>(R.id.nombre).text = nombresPersonajes[position]
-            //Fijamos la imagen de la ciudad
-            rowView.findViewById<ImageView>(R.id.imagenPersonaje).setImageResource(imagenesPersonajes[position])
+            // Establece el texto del TextView con el recurso de cadena
+            rowView.findViewById<TextView>(R.id.nombre).text = nombrePersonajeResourceId
 
-            // Devuelve la vista de fila personalizada
+            rowView.findViewById<ImageView>(R.id.imagenPersonaje)
+                .setImageResource(imagenesPersonajes[position])
+
             return rowView
         }
     }
@@ -442,14 +416,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun revelarCelda(fila: Int, columna: Int, boton: Button) {
         val valor = estadoTablero[fila][columna]
 
-        // Verificar si la celda ya está revelada o marcada (Si no está esta comprobaba eternamente las casillas y hacía bucle infinito)
+        // Verificar si la celda ya está revelada o marcada con bandera
         if (valor == -2 || valor == -3) {
             return
         }
 
         // Si la celda contiene una mina
         if (valor == -1) {
-            boton.setBackgroundResource(R.drawable.setaroja)
+            boton.setBackgroundResource(imagenesPersonajes[seleccion])
             mostrarFinDelJuego(false)
         } else {
             // Si la celda no contiene una mina
@@ -464,15 +438,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 valor == 1 -> {
                     boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
                 }
-
                 valor == 2 -> {
                     boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
                 }
-
                 valor >= 3 -> {
                     boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
                 }
             }
+
             // Si en la casilla hay 0 minas alrededor se deja vacío, si no se muestra el número que hay
             boton.text = if (valor == 0) "" else valor.toString()
             // Se pone valor -2 para indicar que ya no hay minas alrededor
@@ -484,6 +457,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         }
     }
+
 
     /**
      *
@@ -563,5 +537,4 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         }
     }
-
 }
