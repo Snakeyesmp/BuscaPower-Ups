@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.gridlayout.widget.GridLayout
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
 
+    private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         // hace que la toolbar funcione como actionbar para la activity window actual
         setSupportActionBar(toolbar)
-
+        estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
     }
 
     /**
@@ -145,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
         // Inicializar el array bidimensional del tablero
         // Lo que hay entre llaves es una lambda, inicializa todos los valores a 0
-        val estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
+        estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
 
         // Colocar las minas en el tablero
         colocarminas(estadoTablero)
@@ -157,23 +160,12 @@ class MainActivity : AppCompatActivity() {
         gridLayout.rowCount = tamanoTablero
         gridLayout.columnCount = tamanoTablero
 
-        // for anidado con el numero de filas y de columnas
         for (fila in 0 until tamanoTablero) {
             for (columna in 0 until tamanoTablero) {
                 // se crea un boton
                 val boton = Button(this)
-                // Configurar el botón según el estado del tablero
-                when (estadoTablero[fila][columna]) {
-                    -1 -> {
-                        // Si hay una mina, se pone una imagen al botón
-                        boton.setBackgroundResource(R.mipmap.toad_fumon_foreground)
-                    }
-
-                    else -> {
-                        // Si no hay una mina, te dirá cuantas hay alrededor
-                        boton.text = estadoTablero[fila][columna].toString()
-                    }
-                }
+                // Pongo el texto de todos los botones a vacío, para que no aparezca nada
+                boton.text = ""
                 // Esto es para ajustar los parámetros del boton (tamaño, etc.)
                 boton.layoutParams = GridLayout.LayoutParams().apply {
                     width = 0
@@ -185,6 +177,25 @@ class MainActivity : AppCompatActivity() {
                 }
                 // Se agrega cada boton a su espacio en el grid
                 boton.setPadding(0, 0, 0, 0)
+                // Un listener para cada boton
+                boton.setOnClickListener {
+                    revelarCelda(fila, columna,boton)
+                }
+
+                // Configurar el color del texto según el número de minas adyacentes
+                when (estadoTablero[fila][columna]) {
+                    1 -> {
+                        boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
+                    }
+                    2 -> {
+                        boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
+                    }
+                    in 3..8 -> {
+                        boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
+                    }
+                    // Puedes agregar más casos según sea necesario
+                }
+
                 // se añade el boton al grid
                 gridLayout.addView(boton)
             }
@@ -330,5 +341,106 @@ class MainActivity : AppCompatActivity() {
 
     }
     */
+    /**
+     *
+     */
+    private fun revelarCelda(fila: Int, columna: Int, boton: Button) {
+        val valor = estadoTablero[fila][columna]
+
+        // Verificar si la celda ya está revelada o marcada
+        if (valor == -2 || valor == -3) {
+            return
+        }
+
+        // Si la celda contiene una mina
+        if (valor == -1) {
+            boton.setBackgroundResource(R.drawable.setaroja)
+            mostrarFinDelJuego(false)
+        } else {
+            // Si la celda no contiene una mina
+            when {
+                valor == 0 -> {
+                    // Cambiar el fondo del botón cuando el valor es 0
+                    boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
+                    revelarCasillasAdyacentes(fila, columna)
+                }
+                valor == 1 -> {
+                    boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
+                }
+                valor == 2 -> {
+                    boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
+                }
+                valor >= 3 -> {
+                    boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
+                }
+            }
+            // Mostrar el número o dejar la celda vacía
+            boton.text = if (valor == 0) "" else valor.toString()
+
+            estadoTablero[fila][columna] = -2
+
+            if (verificarVictoria()) {
+                mostrarFinDelJuego(true)
+            }
+        }
+    }
+
+    private fun obtenerBoton(fila: Int, columna: Int): Button {
+        val gridLayout: GridLayout = findViewById(R.id.grid)
+        val indiceBoton = fila * tamanoTablero + columna
+        return gridLayout.getChildAt(indiceBoton) as Button
+    }
+
+    private fun verificarVictoria(): Boolean {
+        for (fila in 0 until tamanoTablero) {
+            for (columna in 0 until tamanoTablero) {
+                if (estadoTablero[fila][columna] >= 0 && estadoTablero[fila][columna] != -2) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    // Mostrar un mensaje al final del juego
+    private fun mostrarFinDelJuego(victoria: Boolean) {
+        val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Fin del juego")
+            .setMessage(mensaje)
+            .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
+            .setNegativeButton("Salir") { _, _ -> finish() }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
+        // Verificar si la casilla ya está revelada
+        if (estadoTablero[fila][columna] == -2) {
+            return
+        }
+
+        // Marcar la casilla como revelada
+        estadoTablero[fila][columna] = -2
+
+        // Recorrer las filas adyacentes (arriba, mismo nivel y abajo)
+        for (i in -1..1) {
+            // Recorrer las columnas adyacentes (izquierda, mismo nivel y derecha)
+            for (j in -1..1) {
+                val filaVecina = fila + i
+                val columnaVecina = columna + j
+                // Verificar si la casilla vecina está dentro del tablero
+                if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
+                    // Verificar si la casilla vecina no está revelada ni marcada
+                    if (estadoTablero[filaVecina][columnaVecina] !in listOf(-2, -3)) {
+                        // Obtener el botón correspondiente a la casilla vecina
+                        val botonVecino = obtenerBoton(filaVecina, columnaVecina)
+                        // Llamar recursivamente a revelarCelda para la casilla vecina
+                        revelarCelda(filaVecina, columnaVecina, botonVecino)
+                    }
+                }
+            }
+        }
+    }
 
 }
