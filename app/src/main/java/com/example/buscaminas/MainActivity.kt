@@ -1,6 +1,7 @@
 package com.example.buscaminas
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,11 +19,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.gridlayout.widget.GridLayout
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     // Array con cuantas casilla tiene el lado del tablero
     private val tamanosTablero = arrayOf(8, 12, 16) // Principiante - Amateur - Profesional
+
+
+    private lateinit var fuenteRetro:Typeface
 
     // Array con cuantas minas tiene el tablero
     private val numeroMinas = arrayOf(10, 30, 60) // Principiante - Amateur - Profesional
@@ -40,12 +45,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     // Para saber que imagen va a seleccionar el tablero
     private var seleccion = 0
 
+
     // El numero de banderas que ha puesto el usuario
     private var banderasColocadas = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        fuenteRetro  = ResourcesCompat.getFont(this, R.font.retrofont)!!
 
         // se crea un objeto toolbar, ¡importante importar el correcto!
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -65,7 +73,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
         selectorPersonaje.adapter = adaptadorPersonalizado
 
-
     }
 
     /**
@@ -74,6 +81,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Llamo a mi menu.xml para inflarlo
         menuInflater.inflate(R.menu.menu, menu)
+
         return true
     }
 
@@ -195,6 +203,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 val boton = Button(this)
                 // Pongo el texto de todos los botones a vacío, para que no aparezca nada
                 boton.text = ""
+                // Le pongo la fuente retro de 8bit
+                boton.typeface = fuenteRetro
                 // Esto es para ajustar los parámetros del boton (tamaño, etc.)
                 boton.layoutParams = GridLayout.LayoutParams().apply {
                     width = 0
