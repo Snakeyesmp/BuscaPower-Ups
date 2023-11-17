@@ -22,15 +22,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.gridlayout.widget.GridLayout
 
+/**
+ * Clase principal donde, por desgracia, está to-do el código
+ *
+ */
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-    // Array con cuantas casilla tiene el lado del tablero
-    private val tamanosTablero = arrayOf(8, 12, 16) // Principiante - Amateur - Profesional
 
-
+    // Variable que voy a usar luego para la fuente (Si la inicializo ahora da excepcion)
     private lateinit var fuenteRetro:Typeface
 
-    // Array con cuantas minas tiene el tablero
-    private val numeroMinas = arrayOf(10, 30, 60) // Principiante - Amateur - Profesional
     private var dificultadSeleccionada = 0 // Valor predeterminado
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
@@ -39,8 +39,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
 
     lateinit var nombresPersonajes: Array<String>
-    val imagenesPersonajes =
-        arrayOf(R.drawable.setaroja, R.drawable.setaverde, R.drawable.estrella, R.drawable.flor)
+
 
     // Para saber que imagen va a seleccionar el tablero
     private var seleccion = 0
@@ -53,7 +52,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        fuenteRetro  = ResourcesCompat.getFont(this, R.font.retrofont)!!
+        // las dos exclamaciones al final son porque este valor no puede ser nulo, y están lanzando un nullPointerException (Algo así)
+        fuenteRetro  = ResourcesCompat.getFont(this, R.font.retrofont2)!!
 
         // se crea un objeto toolbar, ¡importante importar el correcto!
         val toolbar: Toolbar = findViewById(R.id.toolbar)
