@@ -204,6 +204,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                     setMargins(0, 0, 0, 0)
                 }
+                boton.setBackgroundResource(R.drawable.bloqueinterrogacion)
                 // Se agrega cada boton a su espacio en el grid
                 boton.setPadding(0, 0, 0, 0)
                 // Un listener de cuando el usuario pulsa para cada boton
@@ -216,7 +217,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     true  // Indica que el evento ha sido manejado
                 }
 
-
+                /*
                 // Configurar el color del texto según el número de minas adyacentes
                 when (estadoTablero[fila][columna]) {
                     1 -> {
@@ -232,6 +233,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     }
                     // Puedes agregar más casos según sea necesario
                 }
+                */
+
+                boton.setTextColor(ContextCompat.getColor(this, R.color.blanco))
 
                 // se añade el boton al grid
                 gridLayout.addView(boton)
@@ -255,11 +259,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             // Aumentar una bandera colocada
             banderasColocadas++
         } else if (valor == -3) {
-            // Si la celda ya tiene bandera, quitar la bandera y restaurar el fondo
-            boton.setBackgroundResource(android.R.color.transparent)  // Establecer a fondo transparente (puedes usar null también)
-            estadoTablero[fila][columna] = 0
-            // Disminuir una bandera colocada
-            banderasColocadas--
+            // Si la celda ya tiene bandera, no hacer nada (quitar la bandera está deshabilitado)
+            return
+        }
+
+        // Verificar si se colocó una bandera en una casilla sin mina
+        if (valor != -1 && valor != -3) {
+            // El usuario colocó una bandera en una casilla sin mina, mostrar mensaje de pérdida
+            mostrarFinDelJuego(false)
+        }
+
+        // Verificar si el usuario ha colocado todas las banderas correctamente
+        if (banderasColocadas == numeroMinas[dificultadSeleccionada]) {
+            mostrarFinDelJuego(true)
         }
     }
 
@@ -400,6 +412,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             rowView.findViewById<ImageView>(R.id.imagenPersonaje)
                 .setImageResource(imagenesPersonajes[position])
 
+
             return rowView
         }
     }
@@ -429,32 +442,20 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             // Si la celda no contiene una mina
             when {
                 valor == 0 -> {
-                    // Cambiar el fondo del botón cuando el valor es 0
-                    boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
+
+                    //boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
                     // Llamar al metodo para que se revelen todas las celdas que sean 0
                     revelarCasillasAdyacentes(fila, columna)
                 }
-                // Cambiar el color del texto según la cantidad de minas que tengan
-                valor == 1 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.verde))
-                }
-                valor == 2 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.naranja))
-                }
-                valor >= 3 -> {
-                    boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
-                }
             }
+
 
             // Si en la casilla hay 0 minas alrededor se deja vacío, si no se muestra el número que hay
             boton.text = if (valor == 0) "" else valor.toString()
+            // Cambiar el fondo del botón cuando el valor es 0
+            boton.setBackgroundResource(R.drawable.bloquepulsado)
             // Se pone valor -2 para indicar que ya no hay minas alrededor
             estadoTablero[fila][columna] = -2
-
-            // Para saber si has ganado o no, tanto si ganas como si pierdes
-            if (verificarVictoria()) {
-                mostrarFinDelJuego(true)
-            }
         }
     }
 
@@ -474,50 +475,33 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return gridLayout.getChildAt(indiceBoton) as Button
     }
 
-    /**
-     *
-     *
-     *
-     * @return true si has ganado la partida, false si la has perdido
-     *
-     */
-    private fun verificarVictoria(): Boolean {
-        for (fila in 0 until tamanoTablero) {
-            for (columna in 0 until tamanoTablero) {
-                if (estadoTablero[fila][columna] >= 0 && estadoTablero[fila][columna] != -2) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
 
     /**
+     *
+     * Mostrará un alert dialog para indicar que se ha terminado la partida, dirá si has ganado o perdido
+     * te dejará empezar otra partida o salir de la aplicación
      *
      * @param victoria: para saber si has ganado o no la partida
      *
      */
     private fun mostrarFinDelJuego(victoria: Boolean) {
+        // Cambiar mensaje según se haya ganado o no
         val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Fin del juego")
             .setMessage(mensaje)
             .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
             .setNegativeButton("Salir") { _, _ -> finish() }
-            .setCancelable(false)
             .show()
     }
 
     private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
-
         // Verificar si la casilla ya está revelada
         if (estadoTablero[fila][columna] == -2) {
             return
         }
-
         // Marcar la casilla como revelada
         estadoTablero[fila][columna] = -2
-
         // Recorrer las filas adyacentes (arriba, mismo nivel y abajo)
         for (i in -1..1) {
             // Recorrer las columnas adyacentes (izquierda, mismo nivel y derecha)

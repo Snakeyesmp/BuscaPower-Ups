@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BuscaMinas</string>
+    <string name="app_name">BuscaPowerUps</string>
 
     <string name="Instrucciones">Instrucciones</string>
     <string name="NuevoJuego">Empezar nueva partida</string>
@@ -11,9 +11,9 @@
 Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay alrededor. Ten cuidado porque si pulsas en una casilla que tenga una mina perderás. Si crees que hay una mina, haz un click largo sobre la casilla para señalarla. No hagas un click largo en una casilla donde no hjay minas porque pederás. Ganas cuando has encontrado todas las minas </string>
 
     <array name="dificultades">
-        <item>Principiante</item>
-        <item>Amateur</item>
-        <item>Profesional</item>
+        <item>Champiñón (8x8)</item>
+        <item>Flor de fuego (12x12)</item>
+        <item>Estrella (16x16)</item>
     </array>
 
 
@@ -21,4 +21,5 @@ Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay al
     <string name="Setaverde">Seta verde</string>
     <string name="Flor">Flor</string>
     <string name="Estrella">Estrella</string>
+
 </resources>
