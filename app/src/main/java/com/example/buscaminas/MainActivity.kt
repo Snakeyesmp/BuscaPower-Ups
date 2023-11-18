@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             getString(R.string.Estrella),
             getString(R.string.Setaroja),
             getString(R.string.Setaverde),
-            getString(R.string.Flor)
+            getString(R.string.FlorDeFuego)
         )
 
         val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
@@ -177,6 +177,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     /**
+     * Metodo para vaciar todas las casillas del tablero
+     */
+    private fun limpiarTablero() {
+        val gridLayout: GridLayout = findViewById(R.id.grid)
+        gridLayout.removeAllViews()
+    }
+
+    /**
      * Metodo para cuando empiezas partida desde el menú
      */
     private fun empezarPartida() {
@@ -252,9 +260,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 */
 
                 boton.setTextColor(ContextCompat.getColor(this, R.color.blanco))
-
+                // Cambiar color para que sea como el del boton cuando está pulsado
+                // gridLayout.setBackgroundColor(Color.parseColor("#db5f21"))
                 // se añade el boton al grid
-                gridLayout.setBackgroundColor(Color.parseColor("#db5f21"))
+
                 gridLayout.addView(boton)
             }
         }
@@ -489,6 +498,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         // Llamo al grid para borrarlo cuando pulse ir al menu
         val gridLayout: GridLayout = findViewById(R.id.grid)
 
+
         mostrarTableroCompleto()
         // Cambiar mensaje según se haya ganado o no
         val mensaje = if (victoria) R.string.ganaste else R.string.perdiste
@@ -501,6 +511,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             // setCancelable es para que no se cierre si el usuario pulsa fuera
             .setCancelable(false)
             .show()
+        //Se vuelve a poner el fondo, para que no se vea marron
+        gridLayout.setBackgroundResource(R.drawable.fondovertical)
     }
 
     private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
