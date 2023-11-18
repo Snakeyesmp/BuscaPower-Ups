@@ -12,5 +12,4 @@ val imagenesPersonajes =
 
 class Utilidades {
 
-
 }
