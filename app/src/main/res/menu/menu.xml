@@ -20,7 +20,7 @@
 
     <item
         android:id="@+id/BotonPersonaje"
-        android:icon="@mipmap/toad_fumon_foreground"
+        android:icon="@drawable/bloqueinterrogacioncalidad"
         android:title="@string/BotonPersonaje"
         app:actionButtonStyle="?android:attr/actionButtonStyle"
         app:showAsAction="always" />

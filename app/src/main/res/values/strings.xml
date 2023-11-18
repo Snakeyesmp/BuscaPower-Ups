@@ -6,20 +6,19 @@
     <string name="Configuracion">Elegir dificultad</string>
     <string name="SeleccionPersonaje">Elije al personaje</string>
     <string name="BotonPersonaje">Boton Personaje</string>
-    <string name="aceptar">Aceptar</string>
+    <string name="aceptar">¡Entendido!</string>
     <string name="ganaste">¡Ganaste la partida!</string>
     <string name="perdiste">Has perdido :(</string>
     <string name="finJuego">Fin del juego</string>
     <string name="irMenu">Ir al menu</string>
-    <string name="InstruccionesCompletas"> El juego es tipo buscaminas:
-Cuando pulsas en un casilla, sale un numero que identifica cuántas minas hay alrededor. Ten cuidado porque si pulsas en una casilla que tenga una mina perderás. Si crees que hay una mina, haz un click largo sobre la casilla para señalarla. No hagas un click largo en una casilla donde no hjay minas porque pederás. Ganas cuando has encontrado todas las minas </string>
-
+    <string name="InstruccionesCompletas"> Las instrucciones son simples ¿sabes jugar al buscaminas? Pues no necesitas seguir leyendo, si no sabes no te preocupes,
+        es muy simple pulsa en una casilla para descubirir lo que hay debajo, te dirá cuantos Power-Ups hay alrededor, o , por el contrario , perderás automáticamente.
+        Si crees que hay un power up en una casilla, manten pulsado y pondrás una bandera, pero no te equivocas, porque también perderás instantáneamente ¡Buena suerte!</string>
     <array name="dificultades">
         <item>Champiñón (8x8)</item>
         <item>Flor de fuego (12x12)</item>
         <item>Estrella (16x16)</item>
     </array>
-
 
     <string name="Setaroja">Seta roja</string>
     <string name="Setaverde">Seta verde</string>

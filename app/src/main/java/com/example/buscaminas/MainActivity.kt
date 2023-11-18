@@ -1,7 +1,6 @@
 package com.example.buscaminas
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -36,10 +35,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     // Variable que voy a usar luego para la fuente (Si la inicializo ahora da excepcion)
     private lateinit var fuenteRetro: Typeface
 
-
-    // TODO cuando se pierde la partida hacer que se muestre ubicación de todas las minas, cambiar el menu de fin de partida.
     private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
-
 
     // Array con los nombres de los personajes
     lateinit var nombresPersonajes : Array<String>
@@ -65,6 +61,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setSupportActionBar(toolbar)
         estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
 
+        // Array con todos los nombres de los personajes
         nombresPersonajes = arrayOf(
             getString(R.string.Estrella),
             getString(R.string.Setaroja),
@@ -72,11 +69,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             getString(R.string.FlorDeFuego)
         )
 
+        // Todas estas lineas son para que el spinner sea el personalizado
         val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
         val adaptadorPersonalizado =
             AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
         selectorPersonaje.adapter = adaptadorPersonalizado
-        // ESTO ES PARA QUE ELIJA BIEN CUAL ES EL ITEM SELECCIONADO DEL SPINNER
         selectorPersonaje.onItemSelectedListener = this
 
     }
@@ -188,7 +185,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      * Metodo para cuando empiezas partida desde el menú
      */
     private fun empezarPartida() {
-
+        // Llamo al spiner y lo hago invisible
+        val spinner = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
+        spinner.visibility = View.INVISIBLE
         // Se crea un gridLayout con el que tenemos en el xml
         val gridLayout: GridLayout = findViewById(R.id.grid)
         // Esto es para que se borren todos los botones previos, porque si no lo que me hacía era sumarlos al grid existente
