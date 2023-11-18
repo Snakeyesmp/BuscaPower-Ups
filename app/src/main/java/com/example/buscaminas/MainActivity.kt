@@ -3,7 +3,6 @@ package com.example.buscaminas
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -351,6 +350,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
+    /**
+     * Coloca o quita una bandera en la celda especificada
+     *
+     * @param fila La fila de la celda en la que se va a colocar ola bandera.
+     * @param columna La columna de la celda en la que se va a colocarla bandera.
+     * @param boton El botón asociado a la celda en la que se va a colocar la bandera.
+     */
     private fun colocarBandera(fila: Int, columna: Int, boton: Button) {
         val valor = estadoTablero[fila][columna]
 
@@ -363,16 +369,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         if (valor != -3 && banderasColocadas < numeroMinas[dificultadSeleccionada]) {
             boton.setBackgroundResource(R.drawable.bandera)
             estadoTablero[fila][columna] = -3
-            // Aumentar una bandera colocada
             banderasColocadas++
         } else if (valor == -3) {
-            // Si la celda ya tiene bandera, no hacer nada (quitar la bandera está deshabilitado)
+            // (Par no poder quitar la bandera)
             return
         }
 
         // Verificar si se colocó una bandera en una casilla sin mina
-        if (valor != -1 && valor != -3) {
-            // El usuario colocó una bandera en una casilla sin mina, mostrar mensaje de pérdida
+        if (valor != -1) {
             mostrarFinDelJuego(false)
         }
 
@@ -384,20 +388,20 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
 
     /**
-     * Cuenta el número de minas adyacentes para una casilla específica en el tablero.
+     * Cuenta el número de minas adyacentes a una celda específica en el tablero
      *
      * @param estadoTablero El estado actual del tablero.
-     * @param fila La fila de la casilla.
-     * @param columna La columna de la casilla.
-     * @return El número de minas adyacentes.
+     * @param fila La fila de la celda para la que se cuentan las minas adyacentes.
+     * @param columna La columna de la celda para la que se cuentan las minas adyacentes.
+     * @return El número de minas adyacentes a la celda especificada.
      */
     private fun contarMinasAdyacentes(
         estadoTablero: Array<Array<Int>>, fila: Int, columna: Int
     ): Int {
         var contadorminas = 0
-        // Recorre las filas adyacentes (arriba, mismo nivel y abajo)
+        // Recorre (arriba, mismo nivel y abajo)
         for (i in -1..1) {
-            // Recorre las columnas adyacentes (Izquierda, mismo nivel y derecha)
+            // Recorre (Izquierda, mismo nivel y derecha)
             for (j in -1..1) {
                 val filaVecina = fila + i
                 val columnaVecina = columna + j
@@ -413,66 +417,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return contadorminas
     }
 
-
-    private fun mostrarSpinnerPersonajes() {
-        val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
-        selectorPersonaje.visibility = View.VISIBLE // hace que el spinner se vea
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        seleccion = position
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        Log.d("SpinnerSelection", "No has elegido na")
-    }
-
-    private inner class AdaptadorPersonalizado(
-        context: Context, resource: Int, objects: Array<String>
-    ) : ArrayAdapter<String>(context, resource, objects) {
-
-        override fun getDropDownView(
-            position: Int, convertView: View?, parent: ViewGroup
-        ): View {
-            return crearFilaPersonalizada(position, convertView, parent)
-        }
-
-        override fun getView(
-            position: Int, convertView: View?, parent: ViewGroup
-        ): View {
-            return crearFilaPersonalizada(position, convertView, parent)
-        }
-
-        private fun crearFilaPersonalizada(
-            position: Int, convertView: View?, parent: ViewGroup
-        ): View {
-            val layoutInflater = LayoutInflater.from(context)
-            val rowView =
-                convertView ?: layoutInflater.inflate(R.layout.spinner_personajes, parent, false)
-
-            // Accede directamente al recurso de cadena usando el índice
-            val nombrePersonajeResourceId = nombresPersonajes[position]
-
-            // Establece el texto del TextView con el recurso de cadena
-            rowView.findViewById<TextView>(R.id.nombre).text = nombrePersonajeResourceId
-
-            rowView.findViewById<ImageView>(R.id.imagenPersonaje)
-                .setImageResource(imagenesPersonajes[position])
-
-
-            return rowView
-        }
-    }
-
-
     /**
+     * Obtiene el botón en la posición especificada dentro del GridLayout.
      *
-     * Este metodo se usa para obtener un boton de una fila y columna determinada, se usa en el metodo de obtener los 0 que hay alrededor
-     *
-     * @param fila : La fila en la que está el botón
-     * @param columna : La columna en la que está el boton
-     *
-     * @return el objeto botón encontrado
+     * @param fila La fila del botón que se desea obtener.
+     * @param columna La columna del botón que se desea obtener.
+     * @return El botón en la posición especificada dentro del GridLayout.
      */
     private fun obtenerBoton(fila: Int, columna: Int): Button {
         val gridLayout: GridLayout = findViewById(R.id.grid)
@@ -480,21 +430,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return gridLayout.getChildAt(indiceBoton) as Button
     }
 
-
     /**
+     * Muestra un cuadro de diálogo que indica el fin del juego, ya sea una victoria o una derrota.
      *
-     * Mostrará un alert dialog para indicar que se ha terminado la partida, dirá si has ganado o perdido
-     * te dejará empezar otra partida o salir de la aplicación
-     *
-     * @param victoria: para saber si has ganado o no la partida
-     *
+     * @param victoria Indica si el juego se ha ganado (true) o perdido (false).
      */
     private fun mostrarFinDelJuego(victoria: Boolean) {
-        // Llamo al grid para borrarlo cuando pulse ir al menu
+
         val gridLayout: GridLayout = findViewById(R.id.grid)
-
-
         mostrarTableroCompleto()
+
         // Cambiar mensaje según se haya ganado o no
         val mensaje = if (victoria) R.string.ganaste else R.string.perdiste
         val builder = AlertDialog.Builder(this)
@@ -502,12 +447,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             // Parametros lambda : DialogInterface, se pone barra baja porque no lo necesito
             .setPositiveButton(R.string.NuevoJuego) { _, _ -> iniciarTablero() }
             .setNegativeButton(R.string.irMenu) { _, _ -> gridLayout.removeAllViews() }
-            // setCancelable es para que no se cierre si el usuario pulsa fuera
-            .setCancelable(false).show()
-        //Se vuelve a poner el fondo, para que no se vea marron
-        gridLayout.setBackgroundResource(R.drawable.fondovertical)
+            .setCancelable(false).show()// Que no se pueda cerrar
     }
 
+    /**
+     * Revela las casillas adyacentes a la posición especificada del tablero.
+     *
+     * @param fila La fila de la celda a partir de la cual se revelarán las casillas adyacentes.
+     * @param columna La columna de la celda a partir de la cual se revelarán las casillas adyacentes.
+     */
     private fun revelarCasillasAdyacentes(fila: Int, columna: Int) {
         // Verificar si la casilla ya está revelada
         if (estadoTablero[fila][columna] == -2) {
@@ -545,8 +493,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     /**
-     * Revela todas las casillas del tablero, pensado para cuando el usuario pierde
-     *
+     * Muestra el el valor de todas las casillas, y muestra las bombas
      */
     private fun mostrarTableroCompleto() {
         for (fila in 0 until tamanoTablero) {
@@ -583,6 +530,69 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+     * Muestra el Spinner de selección de personajes en la interfaz gráfica.
+     * Hace que el Spinner sea visible para que el usuario pueda interactuar con él.
+     */
+    private fun mostrarSpinnerPersonajes() {
+        val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
+        selectorPersonaje.visibility = View.VISIBLE // hace que el spinner se vea
+    }
+
+    /**
+     * Se activa cuando se selecciona un elemento en el AdapterView, en este caso, el Spinner.
+     * Actualiza la variable de clase 'seleccion' con la posición del elemento seleccionado.
+     *
+     * @param parent El AdapterView del cual se seleccionó un elemento.
+     * @param view La vista del elemento seleccionado.
+     * @param position La posición del elemento seleccionado en el adaptador.
+     * @param id El ID del elemento seleccionado.
+     */
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        seleccion = position
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    private inner class AdaptadorPersonalizado(
+        context: Context, resource: Int, objects: Array<String>
+    ) : ArrayAdapter<String>(context, resource, objects) {
+
+        override fun getDropDownView(
+            position: Int, convertView: View?, parent: ViewGroup
+        ): View {
+            return crearFilaPersonalizada(position, convertView, parent)
+        }
+
+        override fun getView(
+            position: Int, convertView: View?, parent: ViewGroup
+        ): View {
+            return crearFilaPersonalizada(position, convertView, parent)
+        }
+
+        private fun crearFilaPersonalizada(
+            position: Int, convertView: View?, parent: ViewGroup
+        ): View {
+            val layoutInflater = LayoutInflater.from(context)
+            val rowView =
+                convertView ?: layoutInflater.inflate(R.layout.spinner_personajes, parent, false)
+
+            // Accede directamente al recurso de cadena usando el índice
+            val nombrePersonajeResourceId = nombresPersonajes[position]
+
+            // Establece el texto del TextView con el recurso de cadena
+            rowView.findViewById<TextView>(R.id.nombre).text = nombrePersonajeResourceId
+
+            rowView.findViewById<ImageView>(R.id.imagenPersonaje)
+                .setImageResource(imagenesPersonajes[position])
+
+            return rowView
         }
     }
 }
