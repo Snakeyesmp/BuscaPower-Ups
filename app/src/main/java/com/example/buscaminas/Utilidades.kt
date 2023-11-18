@@ -8,7 +8,8 @@ val tamanosTablero = arrayOf(8, 12, 16) // Principiante - Amateur - Profesional
 val numeroMinas = arrayOf(10, 30, 60) // Principiante - Amateur - Profesional
 
 val imagenesPersonajes =
-    arrayOf(R.drawable.setaroja, R.drawable.setaverde, R.drawable.estrella, R.drawable.flor)
+    arrayOf( R.drawable.estrella,R.drawable.setaroja, R.drawable.setaverde, R.drawable.flor)
+
 class Utilidades {
 
 

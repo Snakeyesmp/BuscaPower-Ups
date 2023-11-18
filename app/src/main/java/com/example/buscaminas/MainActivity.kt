@@ -1,6 +1,7 @@
 package com.example.buscaminas
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -28,20 +29,23 @@ import androidx.gridlayout.widget.GridLayout
  */
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
-    // Variable que voy a usar luego para la fuente (Si la inicializo ahora da excepcion)
-    private lateinit var fuenteRetro:Typeface
-
     private var dificultadSeleccionada = 0 // Valor predeterminado
     private var tamanoTablero =
         8 // Tamaño por defecto por si el usuario empieza partida sin elegir dificultad
 
+    // Variable que voy a usar luego para la fuente (Si la inicializo ahora da excepcion)
+    private lateinit var fuenteRetro: Typeface
+
+
     // TODO cuando se pierde la partida hacer que se muestre ubicación de todas las minas, cambiar el menu de fin de partida.
     private lateinit var estadoTablero: Array<Array<Int>> // Estado del tablero (almacena las minas y los números adyacentes)
 
-    lateinit var nombresPersonajes: Array<String>
+
+    // Array con los nombres de los personajes
+    lateinit var nombresPersonajes : Array<String>
 
 
-    // Para saber que imagen va a seleccionar el tablero
+    // Para saber que imagen va a seleccionar para las minas
     private var seleccion = 0
 
 
@@ -53,7 +57,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setContentView(R.layout.activity_main)
 
         // las dos exclamaciones al final son porque este valor no puede ser nulo, y están lanzando un nullPointerException (Algo así)
-        fuenteRetro  = ResourcesCompat.getFont(this, R.font.retrofont2)!!
+        fuenteRetro = ResourcesCompat.getFont(this, R.font.retrofont2)!!
 
         // se crea un objeto toolbar, ¡importante importar el correcto!
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -62,9 +66,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
 
         nombresPersonajes = arrayOf(
+            getString(R.string.Estrella),
             getString(R.string.Setaroja),
             getString(R.string.Setaverde),
-            getString(R.string.Estrella),
             getString(R.string.Flor)
         )
 
@@ -204,7 +208,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 // Pongo el texto de todos los botones a vacío, para que no aparezca nada
                 boton.text = ""
                 // Le pongo la fuente retro de 8bit
-                boton.typeface = fuenteRetro
+                boton.typeface = Typeface.create(fuenteRetro, Typeface.BOLD)
                 // Esto es para ajustar los parámetros del boton (tamaño, etc.)
                 boton.layoutParams = GridLayout.LayoutParams().apply {
                     width = 0
@@ -241,13 +245,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     in 3..8 -> {
                         boton.setTextColor(ContextCompat.getColor(this, R.color.rojo))
                     }
-                    // Puedes agregar más casos según sea necesario
+
                 }
                 */
 
                 boton.setTextColor(ContextCompat.getColor(this, R.color.blanco))
 
                 // se añade el boton al grid
+                gridLayout.setBackgroundColor(Color.parseColor("#db5f21"))
                 gridLayout.addView(boton)
             }
         }
@@ -284,8 +289,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             mostrarFinDelJuego(true)
         }
     }
-
-
 
 
     /**
@@ -366,20 +369,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         seleccion = position
-
         val selectedItem = parent?.getItemAtPosition(position).toString()
-        // Agrega un log para imprimir el ítem seleccionado
-        Log.d("SpinnerSelection", "Item seleccionado: $selectedItem")
-
-        // Oculta el Spinner después de seleccionar un personaje
-        val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
-        selectorPersonaje.visibility = View.GONE
+        Log.d("SpinnerSelection", "HAS ELEGIDO: $selectedItem, ÍNDICE: $position")
+        findViewById<Spinner>(R.id.spinnerPersonajesPrincipal).visibility = View.GONE
 
     }
 
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-
+        Log.d("SpinnerSelection", "No has elegido na")
     }
 
     private inner class AdaptadorPersonalizado(
@@ -450,10 +448,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             mostrarFinDelJuego(false)
         } else {
             // Si la celda no contiene una mina
-            when {
-                valor == 0 -> {
-
-                    //boton.setBackgroundColor(ContextCompat.getColor(this, R.color.grisOscuro))
+            when (valor) {
+                0 -> {
                     // Llamar al metodo para que se revelen todas las celdas que sean 0
                     revelarCasillasAdyacentes(fila, columna)
                 }
@@ -495,6 +491,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      *
      */
     private fun mostrarFinDelJuego(victoria: Boolean) {
+        mostrarTableroCompleto()
         // Cambiar mensaje según se haya ganado o no
         val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
         val builder = AlertDialog.Builder(this)
@@ -502,6 +499,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             .setMessage(mensaje)
             .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
             .setNegativeButton("Salir") { _, _ -> finish() }
+            // setCancelable es para que no se cierre si el usuario pulsa fuera
+            .setCancelable(false)
             .show()
     }
 
@@ -510,25 +509,77 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         if (estadoTablero[fila][columna] == -2) {
             return
         }
+
         // Marcar la casilla como revelada
         estadoTablero[fila][columna] = -2
-        // Recorrer las filas adyacentes (arriba, mismo nivel y abajo)
-        for (i in -1..1) {
-            // Recorrer las columnas adyacentes (izquierda, mismo nivel y derecha)
-            for (j in -1..1) {
-                val filaVecina = fila + i
-                val columnaVecina = columna + j
-                // Verificar si la casilla vecina está dentro del tablero
-                if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
-                    // Verificar si la casilla vecina no está revelada ni marcada
-                    if (estadoTablero[filaVecina][columnaVecina] !in listOf(-2, -3)) {
-                        // Obtener el botón correspondiente a la casilla vecina
-                        val botonVecino = obtenerBoton(filaVecina, columnaVecina)
-                        // Llamar recursivamente a revelarCelda para la casilla vecina
-                        revelarCelda(filaVecina, columnaVecina, botonVecino)
+
+        /*
+         * Esto es para que no recorra las diagonales, solo arriba, abajo, izquierda y derecha
+         *
+         * (fila -1 y columna se queda igual, luego fila +1 y columna se queda igual y así...)
+         *
+         */
+        val direcciones = arrayOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
+
+        // Recorrer las direcciones posibles
+        for ((filaDir, colDir) in direcciones) {
+            val filaVecina = fila + filaDir
+            val columnaVecina = columna + colDir
+
+            // Verificar si la casilla vecina está dentro del tablero
+            if (filaVecina in 0 until tamanoTablero && columnaVecina in 0 until tamanoTablero) {
+                // Verificar si la casilla vecina no está revelada ni marcada
+                if (estadoTablero[filaVecina][columnaVecina] != -2 && estadoTablero[filaVecina][columnaVecina] != -3) {
+                    // Obtener el botón correspondiente a la casilla vecina
+                    val botonVecino = obtenerBoton(filaVecina, columnaVecina)
+
+                    // Llamar recursivamente a revelarCelda para la casilla vecina
+                    revelarCelda(filaVecina, columnaVecina, botonVecino)
+                }
+            }
+        }
+    }
+
+    /**
+     * Revela todas las casillas del tablero, pensado para cuando el usuario pierde
+     *
+     */
+    private fun mostrarTableroCompleto() {
+        val gridLayout: GridLayout = findViewById(R.id.grid)
+
+        for (fila in 0 until tamanoTablero) {
+            for (columna in 0 until tamanoTablero) {
+                val boton = obtenerBoton(fila, columna)
+                val valor = estadoTablero[fila][columna]
+
+                // Verificar si la casilla ya está revelada
+                if (valor == -2) {
+                    continue
+                }
+
+                // Marcar la casilla como revelada
+                estadoTablero[fila][columna] = -2
+
+                // Establecer el fondo según el valor de la casilla
+                when (valor) {
+                    -1 -> {
+                        // Imagen de la mina
+                        boton.setBackgroundResource(imagenesPersonajes[seleccion])
+                    }
+                    -3 -> {
+                        // Imagen de la bandera
+                        boton.setBackgroundResource(R.drawable.bandera)
+                    }
+                    else -> {
+                        // Imagen pulsada
+                        boton.setBackgroundResource(R.drawable.bloquepulsado)
+
+                        // Mostrar el número
+                        boton.text = if (valor == 0) "" else valor.toString()
                     }
                 }
             }
         }
     }
+
 }
