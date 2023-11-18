@@ -76,6 +76,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val adaptadorPersonalizado =
             AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
         selectorPersonaje.adapter = adaptadorPersonalizado
+        // ESTO ES PARA QUE ELIJA BIEN CUAL ES EL ITEM SELECCIONADO DEL SPINNER
+        selectorPersonaje.onItemSelectedListener = this
 
     }
 
@@ -357,29 +359,22 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
+
     private fun mostrarPopupSeleccionPersonaje2() {
 
         val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
-
         // Cambia la visibilidad del Spinner a VISIBLE
         selectorPersonaje.visibility = View.VISIBLE
-
 
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         seleccion = position
-        val selectedItem = parent?.getItemAtPosition(position).toString()
-        Log.d("SpinnerSelection", "HAS ELEGIDO: $selectedItem, ÍNDICE: $position")
-        findViewById<Spinner>(R.id.spinnerPersonajesPrincipal).visibility = View.GONE
-
     }
-
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         Log.d("SpinnerSelection", "No has elegido na")
     }
-
     private inner class AdaptadorPersonalizado(
         context: Context,
         resource: Int,
@@ -491,14 +486,18 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      *
      */
     private fun mostrarFinDelJuego(victoria: Boolean) {
+        // Llamo al grid para borrarlo cuando pulse ir al menu
+        val gridLayout: GridLayout = findViewById(R.id.grid)
+
         mostrarTableroCompleto()
         // Cambiar mensaje según se haya ganado o no
-        val mensaje = if (victoria) "¡Ganaste!" else "¡Perdiste!"
+        val mensaje = if (victoria) R.string.ganaste else R.string.perdiste
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Fin del juego")
+        builder.setTitle(R.string.finJuego)
             .setMessage(mensaje)
-            .setPositiveButton("Nuevo Juego") { _, _ -> empezarPartida() }
-            .setNegativeButton("Salir") { _, _ -> finish() }
+            // Parametros lambda : DialogInterface, se pone barra baja porque no lo necesito
+            .setPositiveButton(R.string.NuevoJuego) { _,_ -> empezarPartida() }
+            .setNegativeButton(R.string.irMenu) { _, _ -> gridLayout.removeAllViews() }
             // setCancelable es para que no se cierre si el usuario pulsa fuera
             .setCancelable(false)
             .show()
@@ -545,8 +544,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      *
      */
     private fun mostrarTableroCompleto() {
-        val gridLayout: GridLayout = findViewById(R.id.grid)
-
         for (fila in 0 until tamanoTablero) {
             for (columna in 0 until tamanoTablero) {
                 val boton = obtenerBoton(fila, columna)
