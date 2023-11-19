@@ -177,6 +177,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      *
      */
     private fun iniciarTablero() {
+        banderasColocadas = 0
         val gridLayout: GridLayout = findViewById(R.id.grid) // grid del XML
         gridLayout.removeAllViews() // se limpia el grid
         // Para establecer el numero de filas y de columnas
@@ -351,7 +352,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     /**
-     * Coloca o quita una bandera en la celda especificada
+     * Coloca una bandera en la celda especificada
      *
      * @param fila La fila de la celda en la que se va a colocar ola bandera.
      * @param columna La columna de la celda en la que se va a colocarla bandera.
@@ -371,19 +372,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             estadoTablero[fila][columna] = -3
             banderasColocadas++
         } else if (valor == -3) {
-            // (Par no poder quitar la bandera)
+            // (Para no poder quitar la bandera)
             return
         }
 
-        // Verificar si se colocó una bandera en una casilla sin mina
-        if (valor != -1) {
+        // Verificar condición de victoria
+        if (valor != -1)
             mostrarFinDelJuego(false)
-        }
-
-        // Verificar si el usuario ha colocado todas las banderas correctamente
-        if (banderasColocadas == numeroMinas[dificultadSeleccionada]) {
+        else if (banderasColocadas == numeroMinas[dificultadSeleccionada])
             mostrarFinDelJuego(true)
-        }
     }
 
 
