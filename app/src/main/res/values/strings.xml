@@ -11,17 +11,17 @@
     <string name="perdiste">Has perdido :(</string>
     <string name="finJuego">Fin del juego</string>
     <string name="irMenu">Ir al menu</string>
-    <string name="InstruccionesCompletas"> Las instrucciones son simples ¿sabes jugar al buscaminas? Pues no necesitas seguir leyendo, si no sabes no te preocupes,
-        es muy simple pulsa en una casilla para descubirir lo que hay debajo, te dirá cuantos Power-Ups hay alrededor, o , por el contrario , perderás automáticamente.
-        Si crees que hay un power up en una casilla, manten pulsado y pondrás una bandera, pero no te equivocas, porque también perderás instantáneamente ¡Buena suerte!</string>
+    <string name="InstruccionesCompletas"> Las instrucciones son simples ¿sabes jugar al buscaminas? Pues no necesitas seguir leyendo, si no sabes, no te preocupes,
+        es muy simple ,pulsa en una casilla para descubrir lo que hay debajo, te dirá cuantos Power-Ups hay alrededor, o , por el contrario , perderás automáticamente.
+        Si crees que hay un power-up en una casilla, manten pulsado y pondrás una bandera, pero no te equivoques, porque también perderás instantáneamente ¡Buena suerte!</string>
     <array name="dificultades">
         <item>Champiñón (8x8)</item>
         <item>Flor de fuego (12x12)</item>
         <item>Estrella (16x16)</item>
     </array>
 
-    <string name="Setaroja">Seta roja</string>
-    <string name="Setaverde">Seta verde</string>
+    <string name="Setaroja">Champiñón rojo</string>
+    <string name="Setaverde">Champiñón verde</string>
     <string name="FlorDeFuego">Flor de fuego</string>
     <string name="Estrella">Estrella</string>
 
