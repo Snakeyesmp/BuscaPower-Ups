@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import androidx.gridlayout.widget.GridLayout
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
@@ -19,8 +20,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.gridlayout.widget.GridLayout
 import kotlin.random.Random
+
+
 
 /**
  * Clase principal donde, por desgracia, está to-do el código
@@ -29,7 +31,7 @@ import kotlin.random.Random
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private var dificultadSeleccionada = 0
-    private var tamanoTablero = 8
+    private var tamanoTablero = tamanosTablero[0]
 
     private lateinit var fuenteRetro: Typeface // Variable para la fuente (Lateinit o excepción)
     private lateinit var estadoTablero: Array<Array<Int>> // Almacena los numeros de cada casilla
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var banderasColocadas = 0 // El numero de banderas que ha puesto el usuario
 
     /**
-     * Método llamado cuando se crea la activida
+     * Método llamado cuando se crea la actividad
      *
      * @param savedInstanceState
      */
@@ -48,14 +50,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         fuenteRetro = ResourcesCompat.getFont(
             this, R.font.retrofont2
-        )!! // "!!" Esto es para que el programa continue aunque sea nulo (algo así?)
+        )!! // "!!" Esto es para que el programa sepa que esto nunca va a ser nulo (?)
 
         // se crea un objeto toolbar, y hace que funcione como actionbar principal
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         estadoTablero = Array(tamanoTablero) { Array(tamanoTablero) { 0 } }
-
         // Array con todos los nombres de los personajes
         nombresPersonajes = arrayOf(
             getString(R.string.Estrella),
@@ -63,14 +63,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             getString(R.string.Setaverde),
             getString(R.string.FlorDeFuego)
         )
-
         // Para que el spinner sea el personalizado
         val selectorPersonaje = findViewById<Spinner>(R.id.spinnerPersonajesPrincipal)
         val adaptadorPersonalizado =
             AdaptadorPersonalizado(this, R.layout.spinner_personajes, nombresPersonajes)
         selectorPersonaje.adapter = adaptadorPersonalizado
         selectorPersonaje.onItemSelectedListener = this
-
     }
 
     /**
